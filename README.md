@@ -106,5 +106,3 @@ Contributions are welcome! If you have ideas for new features or improvements, f
 ---
 
 Maintained by [Goodwin Omollo](https://github.com/goodwin-omollo)
-
-# image-cropper

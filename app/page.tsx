@@ -54,7 +54,9 @@ export default function TestPage() {
             />
             <div>
               <FieldDescription>Download Cropped Image</FieldDescription>
-              <IoIosDownload size={30} onClick={handleDownload} className="cursor-pointer" />
+              <Button onClick={handleDownload} className="cursor-pointer mt-2">
+                Download
+              </Button>
             </div>
           </div>
         )}
