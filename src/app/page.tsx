@@ -1,16 +1,33 @@
 "use client";
 
-import { ThemeToggle } from "@/components/modeToggle";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import ImageCropper from "@/components/ui/shadcn-io/image-crop";
-import { useState } from "react";
-import { IoIosDownload } from "react-icons/io";
+import { ThemeToggle } from "@/src/components/modeToggle";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { Field, FieldDescription, FieldLabel } from "@/src/components/ui/field";
+import ImageCropper from "@/src/components/ui/shadcn-io/image-crop";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { FaGithub } from "react-icons/fa";
 
 export default function TestPage() {
   const [file, setFile] = useState<File | null>(null);
   const [cropped, setCropped] = useState<string>("");
+  const [stars, setStars] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchStars = async () => {
+      try {
+        const res = await fetch("https://api.github.com/repos/goodwin-omollo/image-cropper", {
+          next: { revalidate: 3600 }
+        });
+        const data = await res.json();
+        setStars(data.stargazers_count);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchStars();
+  }, []);
 
   const handleDownload = () => {
     const a = document.createElement("a");
@@ -19,10 +36,21 @@ export default function TestPage() {
     a.click();
   };
 
+
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center absolute">
-      <div className="absolute top-4 right-4 md:right-16">
-        <ThemeToggle />
+      <div className="absolute top-4 right-4 left-4 md:right-16 md:left-16">
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href="https://github.com/goodwin-omollo/image-cropper"
+            target="_blank"
+            className="flex items-center text-sm gap-2 bg-muted/50 px-3 py-1 rounded-lg"
+          >
+            <FaGithub size={16} /> ⭐ {stars ?? "—"}
+          </Link>
+          <ThemeToggle />
+        </div>
       </div>
       <div className="p-6 space-y-4">
         <Field>
