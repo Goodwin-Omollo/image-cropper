@@ -19,27 +19,27 @@ import { Button } from "@/src/components/ui/button";
 const centerAspectCrop = (
   mediaWidth: number,
   mediaHeight: number,
-  aspect?: number
+  aspect?: number,
 ): PercentCrop =>
   aspect
     ? centerCrop(
-      makeAspectCrop(
-        {
-          unit: "%",
-          width: 90,
-        },
-        aspect,
+        makeAspectCrop(
+          {
+            unit: "%",
+            width: 90,
+          },
+          aspect,
+          mediaWidth,
+          mediaHeight,
+        ),
         mediaWidth,
-        mediaHeight
-      ),
-      mediaWidth,
-      mediaHeight
-    )
+        mediaHeight,
+      )
     : { x: 5, y: 5, width: 90, height: 90, unit: "%" }; // freeform default
 
 const getCroppedPngImage = async (
   image: HTMLImageElement,
-  crop: PixelCrop
+  crop: PixelCrop,
 ): Promise<string> => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -60,7 +60,7 @@ const getCroppedPngImage = async (
     0,
     0,
     crop.width,
-    crop.height
+    crop.height,
   );
 
   return canvas.toDataURL("image/png");
@@ -70,10 +70,12 @@ export default function ImageCropper({
   file,
   aspect, // pass undefined for freeform
   onCrop,
+  onReset,
 }: {
   file: File;
   aspect?: number;
   onCrop?: (croppedDataUrl: string) => void;
+  onReset?: () => void;
 }) {
   const [imgSrc, setImgSrc] = useState<string>("");
   const [crop, setCrop] = useState<PercentCrop>();
@@ -83,7 +85,7 @@ export default function ImageCropper({
   useEffect(() => {
     const reader = new FileReader();
     reader.addEventListener("load", () =>
-      setImgSrc(reader.result?.toString() || "")
+      setImgSrc(reader.result?.toString() || ""),
     );
     reader.readAsDataURL(file);
   }, [file]);
@@ -94,7 +96,7 @@ export default function ImageCropper({
       const initialCrop = centerAspectCrop(width, height, aspect);
       setCrop(initialCrop);
     },
-    [aspect]
+    [aspect],
   );
 
   const handleApplyCrop = async () => {
@@ -102,6 +104,13 @@ export default function ImageCropper({
       const cropped = await getCroppedPngImage(imgRef.current, completedCrop);
       onCrop?.(cropped);
     }
+  };
+
+  const handleReset = () => {
+    setImgSrc("");
+    setCrop(undefined);
+    setCompletedCrop(null);
+    onReset?.();
   };
 
   return (
@@ -120,12 +129,9 @@ export default function ImageCropper({
         )}
       </div>
 
-
-      <div className="w-full flex justify-end mt-2">
-        <Button
-          onClick={handleApplyCrop}
-          variant="default"
-        >
+      <div className="max-w-lg flex justify-between mt-2">
+        <Button onClick={handleReset}>Reset</Button>
+        <Button onClick={handleApplyCrop} variant="default">
           Apply Crop
         </Button>
       </div>
